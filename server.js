@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const PORT = process.env.PORT || 3000;
 
 const SOCKET_EVENTS = {
   CLAP: 'clap',
@@ -9,7 +10,7 @@ const SOCKET_EVENTS = {
   END_PLAY: 'end-play'
 }
  
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: PORT });
  
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(event) {
