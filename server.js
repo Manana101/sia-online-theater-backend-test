@@ -48,7 +48,7 @@ const countdown = (endTime) => {
   alarms.playTimeout = setTimeout(() => {
     wss.clients.forEach(function each(client) {
       const event =
-        playState.currentPhase === AFTER_THE_BELL
+        playState.currentPhase === PHASES.AFTER_THE_BELL
           ? SOCKET_EVENTS.START_PLAY
           : SOCKET_EVENTS.END_INTERMISSION
       if (client.readyState === WebSocket.OPEN) {
