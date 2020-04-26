@@ -30,7 +30,7 @@ const defaultPlayState = {
   timerEnd: null,
 }
 
-const playState = { ...defaultPlayState }
+let playState = { ...defaultPlayState }
 
 const alarms = {}
 
