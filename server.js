@@ -20,15 +20,17 @@ const PHASES = {
   AFTER_THE_SHOW: 'after_the_show',
 }
  
-const wss = new WebSocket.Server({ port: PORT });
+const wss = new WebSocket.Server({ port: PORT })
 
-const playState = {
+const defaultPlayState = {
   curtainOpen: false,
   totalClapCount: 0,
   currentPhase: PHASES.BEFORE_THE_BELL,
   currentAct: 1,
   timerEnd: null,
 }
+
+const playState = { ...defaultPlayState }
 
 const alarms = {}
 
@@ -95,6 +97,7 @@ wss.on('connection', function connection(ws) {
       case SOCKET_EVENTS.END_PLAY:
         playState.currentPhase = PHASES.AFTER_THE_SHOW
         clearTimeout(alarms.playTimeout)
+        playState = defaultPlayState
         break;
     }
 
