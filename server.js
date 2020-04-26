@@ -93,6 +93,7 @@ wss.on('connection', function connection(ws) {
         break;
       case SOCKET_EVENTS.END_PLAY:
         playState.currentPhase = PHASES.AFTER_THE_SHOW
+        clearTimeout(alarms.playTimeout)
         break;
     }
 
