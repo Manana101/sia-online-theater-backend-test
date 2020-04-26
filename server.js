@@ -7,7 +7,9 @@ const SOCKET_EVENTS = {
   CLOSE_CURTAIN: 'close-curtain',
   RING_BELL: 'ring-bell',
   START_INTERMISSION: 'start-intermission',
-  END_PLAY: 'end-play'
+  END_PLAY: 'end-play',
+  START_PLAY: 'start-play',
+  END_INTERMISSION: 'end-intermission',
 }
 
 const PHASES = {
@@ -26,6 +28,34 @@ const playState = {
   currentPhase: PHASES.BEFORE_THE_BELL,
   currentAct: 1,
   timerEnd: null,
+}
+
+const alarms = {}
+
+const getEndTime = () => {
+  const now = Date.now()
+  // const minutes = playState.currentPhase === PHASES.AFTER_THE_BELL ? 10 : 20 // real times
+  const minutes = playState.currentPhase === PHASES.AFTER_THE_BELL ? 0.05 : 0.01 // demo times
+  const expiry = now + minutes * 60000
+  return expiry
+}
+
+const countdown = (endTime) => {
+  const delay = endTime - Date.now()
+  if (alarms.playTimeout) {
+    clearTimeout(alarms.playTimeout)
+  }
+  alarms.playTimeout = setTimeout(() => {
+    wss.clients.forEach(function each(client) {
+      const event =
+        playState.currentPhase === AFTER_THE_BELL
+          ? SOCKET_EVENTS.START_PLAY
+          : SOCKET_EVENTS.END_INTERMISSION
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(event);
+      }
+    })
+  }, delay);
 }
  
 wss.on('connection', function connection(ws) {
@@ -52,12 +82,14 @@ wss.on('connection', function connection(ws) {
         break;
       case SOCKET_EVENTS.RING_BELL:
         playState.currentPhase = PHASES.AFTER_THE_BELL
-        // set timeout to start the play
+        playState.timerEnd = getEndTime()
+        countdown(playState.timerEnd) // set timeout to start the play
         break;
       case SOCKET_EVENTS.START_INTERMISSION:
         playState.currentPhase = PHASES.INTERMISSION
         playState.currentAct ++
-        // set timeout to start act 2
+        playState.timerEnd = getEndTime()
+        countdown(playState.timerEnd) // set timeout to start act 2
         break;
       case SOCKET_EVENTS.END_PLAY:
         playState.currentPhase = PHASES.AFTER_THE_SHOW
@@ -80,9 +112,11 @@ wss.on('connection', function connection(ws) {
             break;
           case SOCKET_EVENTS.RING_BELL:
             client.send(SOCKET_EVENTS.RING_BELL);
+            client.send(JSON.stringify(playState));
             break;
           case SOCKET_EVENTS.START_INTERMISSION:
             client.send(SOCKET_EVENTS.START_INTERMISSION);
+            client.send(JSON.stringify(playState));
             break;
           case SOCKET_EVENTS.END_PLAY:
             client.send(SOCKET_EVENTS.END_PLAY);
