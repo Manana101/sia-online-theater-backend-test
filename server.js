@@ -56,6 +56,7 @@ const countdown = (endTime) => {
           : SOCKET_EVENTS.END_INTERMISSION
       if (client.readyState === WebSocket.OPEN) {
         client.send(event);
+        playState.currentPhase = PHASES.SHOW_TIME
       }
     })
   }, delay);
