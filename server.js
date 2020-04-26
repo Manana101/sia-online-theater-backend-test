@@ -17,7 +17,8 @@ wss.on('connection', function connection(ws) {
     console.log('received event: ', event);
 
     wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
+      // client !== ws && 
+      if (client.readyState === WebSocket.OPEN) {
         switch(event) {
           case SOCKET_EVENTS.CLAP:
             client.send(SOCKET_EVENTS.CLAP);
