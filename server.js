@@ -29,7 +29,12 @@ const playState = {
 }
  
 wss.on('connection', function connection(ws) {
-  ws.send(playState)
+  console.log('connection')
+  try {
+    ws.send(JSON.stringify(playState))
+  } catch (err) {
+    console.log('error when sending play state on connection: ', err)
+  }
 
   ws.on('message', function incoming(event) {
     console.log('received event: ', event);
