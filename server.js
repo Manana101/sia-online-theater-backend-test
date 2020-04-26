@@ -9,15 +9,59 @@ const SOCKET_EVENTS = {
   START_INTERMISSION: 'start-intermission',
   END_PLAY: 'end-play'
 }
+
+const PHASES = {
+  BEFORE_THE_BELL: 'before_the_bell',
+  AFTER_THE_BELL: 'after_the_bell',
+  SHOW_TIME: 'show_time',
+  INTERMISSION: 'intermission',
+  AFTER_THE_SHOW: 'after_the_show',
+}
  
 const wss = new WebSocket.Server({ port: PORT });
+
+const playState = {
+  curtainOpen: false,
+  totalClapCount: 0,
+  currentPhase: PHASES.BEFORE_THE_BELL,
+  currentAct: 1,
+  timerEnd: null,
+}
  
 wss.on('connection', function connection(ws) {
+  ws.send(playState)
+
   ws.on('message', function incoming(event) {
     console.log('received event: ', event);
 
+    // handle play state
+    switch(event) {
+      case SOCKET_EVENTS.CLAP:
+        playState.totalClapCount++
+        break;
+      case SOCKET_EVENTS.OPEN_CURTAIN:
+        playState.curtainOpen = true
+        break;
+      case SOCKET_EVENTS.CLOSE_CURTAIN:
+        playState.curtainOpen = false
+        break;
+      case SOCKET_EVENTS.RING_BELL:
+        playState.currentPhase = PHASES.AFTER_THE_BELL
+        // set timeout to start the play
+        break;
+      case SOCKET_EVENTS.START_INTERMISSION:
+        playState.currentPhase = PHASES.INTERMISSION
+        playState.currentAct ++
+        // set timeout to start act 2
+        break;
+      case SOCKET_EVENTS.END_PLAY:
+        playState.currentPhase = PHASES.AFTER_THE_SHOW
+        break;
+    }
+
+    // send event to all clients
     wss.clients.forEach(function each(client) {
-      // client !== ws && 
+      // client !== ws && -> for now we want to send events back to the client for demo purposes
       if (client.readyState === WebSocket.OPEN) {
         switch(event) {
           case SOCKET_EVENTS.CLAP:
