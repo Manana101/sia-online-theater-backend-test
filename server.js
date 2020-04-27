@@ -20,7 +20,7 @@ const PHASES = {
   AFTER_THE_SHOW: 'after_the_show',
 }
  
-// const wss = new WebSocket.Server({ port: PORT })
+const wss = new WebSocket.Server({ port: PORT })
 
 const defaultPlayState = {
   curtainOpen: false,
@@ -33,7 +33,7 @@ const defaultPlayState = {
 const id = 1
 
 const connectPlay = (id) => {
-  const wss = new WebSocket.Server(`ws://sia-backend-test.herokuapp.com/${id}`, { port: PORT })
+  const wss = new WebSocket.Server(`wss://sia-backend-test.herokuapp.com/${id}`, { port: PORT })
 
   let playState = { ...defaultPlayState }
   const alarms = {}
