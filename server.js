@@ -37,7 +37,7 @@ const alarms = {}
 const getEndTime = () => {
   const now = Date.now()
   // const minutes = playState.currentPhase === PHASES.AFTER_THE_BELL ? 10 : 20 // real times
-  const minutes = playState.currentPhase === PHASES.AFTER_THE_BELL ? 0.1 : 0.2 // demo times
+  const minutes = playState.currentPhase === PHASES.AFTER_THE_BELL ? 0.1 : 0.1 // demo times
   const expiry = now + minutes * 60000
   return expiry
 }
